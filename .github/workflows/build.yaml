@@ -29,6 +29,9 @@ jobs:
 
       - name: Build image
         run: nix run nixpkgs#nixos-rebuild -- build-image --image-variant oci --flake .#ollama --accept-flake-config
+      
+      - name: Debug result
+        run: ls -la result/ && find result -maxdepth 3
 
       - name: Install skopeo
         run: nix profile install nixpkgs#skopeo
