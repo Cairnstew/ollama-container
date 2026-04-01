@@ -5,6 +5,10 @@
     nixos-generators.url = "github:nix-community/nixos-generators";
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
   };
+  nixConfig = {
+    extra-substituters = [ "https://ollama-docker-cache.cachix.org" ];
+    extra-trusted-public-keys = [ "ollama-docker-cache.cachix.org-1:GcJN4S1yLkht4HNSFHzC9ark4sqpUoCDr/RsgexhFiM=" ];
+  };
   outputs = inputs:
     let
       flakeContext = {
