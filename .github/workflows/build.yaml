@@ -32,7 +32,7 @@ jobs:
 
       - name: Load image into Docker
         if: github.ref == 'refs/heads/main'
-        run: docker load < result
+        run: tar -C result -czf image.tar.gz . && docker load < image.tar.gz
 
       - name: Tag and push image
         if: github.ref == 'refs/heads/main'
