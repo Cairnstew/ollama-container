@@ -1,5 +1,6 @@
 { inputs, ... }@flakeContext:
 let
+  nixpkgs = inputs.nixpkgs;
   nixosModule = { config, lib, pkgs, ... }: {
     imports = [
       inputs.self.nixosModules.docker
@@ -9,10 +10,10 @@ let
     ];
   };
 in
-inputs.nixos-generators.nixosGenerate {
+(nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
-  format = "docker";
   modules = [
     nixosModule
+    "${nixpkgs}/nixos/modules/virtualisation/docker-image.nix"
   ];
-}
+}).config.system.build.dockerImage

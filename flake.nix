@@ -1,9 +1,7 @@
 {
   description = "Basic container flake";
   inputs = {
-    nixpkgs.url = "flake:nixpkgs/nixpkgs-unstable";
-    nixos-generators.url = "github:nix-community/nixos-generators";
-    nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
   nixConfig = {
     extra-substituters = [ "https://ollama-docker-cache.cachix.org" ];
