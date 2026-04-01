@@ -28,7 +28,7 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Build image
-        run: nix run nixpkgs#nixos-rebuild -- build-image --image-variant docker --flake .#ollama --accept-flake-config
+        run: nix run nixpkgs#nixos-rebuild -- build-image --image-variant oci --flake .#ollama --accept-flake-config
 
       - name: Load image into Docker
         if: github.ref == 'refs/heads/main'
