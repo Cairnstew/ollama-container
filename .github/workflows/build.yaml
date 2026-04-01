@@ -28,8 +28,13 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Build image
-        run: nix run nixpkgs#nixos-rebuild -- build-image --image-variant oci --flake .#ollama --accept-flake-config
-      
+        run: |
+          nix run nixpkgs#nixos-generators -- \
+            --format docker \
+            --flake .#ollama \
+            --accept-flake-config \
+            -o result
+            
       - name: Debug result
         run: ls -la result/ && find result -maxdepth 3
 
