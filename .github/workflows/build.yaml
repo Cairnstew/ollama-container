@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixpkgs-unstable
+          extra_nix_config: |
+            extra-substituters = https://nix-community.cachix.org https://cuda-maintainers.cachix.org
+            extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCUSeBc= cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E=
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: ollama-docker-cache
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build image
+        run: nix build .#packages.x86_64-linux.nixos
+
+      - name: Load image into Docker
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker load < result
+
+      - name: Tag and push image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          IMAGE_ID=$(docker images --format '{{.ID}}' | head -1)
+          docker tag $IMAGE_ID ghcr.io/${{ github.repository }}:latest
+          docker tag $IMAGE_ID ghcr.io/${{ github.repository }}:${{ github.sha }}
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
