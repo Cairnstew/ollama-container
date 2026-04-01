@@ -28,12 +28,11 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Build image
-        run: nix build .#packages.x86_64-linux.nixos --accept-flake-config
+        run: nixos-rebuild build-image --image-variant docker --flake .#ollama --accept-flake-config
 
       - name: Load image into Docker
         if: github.ref == 'refs/heads/main'
-        run: |
-          docker load < result
+        run: docker load < result
 
       - name: Tag and push image
         if: github.ref == 'refs/heads/main'
