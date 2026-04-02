@@ -35,7 +35,7 @@ jobs:
             -o result
             
       - name: Debug result
-        run: ls -la result/
+        run: ls -la result/tarball/ && ls -la result/nix-support/
 
       - name: Install skopeo
         run: nix profile install nixpkgs#skopeo
