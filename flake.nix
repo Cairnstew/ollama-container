@@ -36,7 +36,7 @@
         config = {
           Cmd = [ "${nixos.config.services.ollama.package}/bin/ollama" "serve" ];
           Env = [
-            "OLLAMA_HOST=${nixos.config.services.ollama.listenAddress}"
+            "OLLAMA_HOST=${nixos.config.services.ollama.host}:${toString nixos.config.services.ollama.port}"
             
           ];
           ExposedPorts = { "11434/tcp" = {}; };
