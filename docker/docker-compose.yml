@@ -1,19 +1,26 @@
 services:
   ollama:
     image: ghcr.io/cairnstew/ollama-container:latest
+    container_name: ollama
     restart: unless-stopped
+    # Privileged helps with execution permissions for the GPU probe on NixOS
+    privileged: true 
     ports:
       - "11434:11434"
     volumes:
       - ollama-models:/root/.ollama
-    devices:
-      - /dev/nvidiactl
-      - /dev/nvidia0
-      - /dev/nvidia-uvm
+      - /tmp:/tmp
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: cdi
+              capabilities: [gpu]
+              device_ids:
+                - nvidia.com/gpu=all
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
       interval: 30s
@@ -23,20 +30,23 @@ services:
 
   ollama-pull:
     image: ghcr.io/cairnstew/ollama-container:latest
-    restart: no
+    container_name: ollama-pull
+    restart: "no"
+    privileged: true
     depends_on:
       ollama:
         condition: service_healthy
     volumes:
       - ollama-models:/root/.ollama
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        ollama pull llama3.2
-    devices:
-      - /dev/nvidiactl
-      - /dev/nvidia0
-      - /dev/nvidia-uvm
+      - /tmp:/tmp
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: cdi
+              capabilities: [gpu]
+              device_ids:
+                - nvidia.com/gpu=all
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - NVIDIA_VISIBLE_DEVICES=all
