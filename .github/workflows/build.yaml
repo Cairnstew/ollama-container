@@ -34,8 +34,8 @@ jobs:
             --flake .#ollama \
             -o result
             
-      - name: Debug result
-        run: ls -la result/tarball/ && ls -la result/nix-support/
+      - name: Debug tarball contents
+        run: tar -tJf result/tarball/nixos-system-x86_64-linux.tar.xz | head -30
 
       - name: Install skopeo
         run: nix profile install nixpkgs#skopeo
