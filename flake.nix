@@ -25,10 +25,22 @@
       packages.x86_64-linux.default = pkgs.dockerTools.buildLayeredImage {
         name = "ollama";
         tag = "latest";
-        contents = [ nixos.config.system.build.toplevel ];
+        maxLayers = 125;
+        contents = with nixos.config; [
+          # Only the packages your modules actually need at runtime
+          services.ollama.package          # the ollama binary
+          pkgs.dockerTools.caCertificates  # replaces your SSL_CERT_FILE env var
+          pkgs.bashInteractive
+          pkgs.coreutils
+        ];
         config = {
-          Cmd = [ "${nixos.config.system.build.toplevel}/init" ];
-          Env = [ "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt" ];
+          Cmd = [ "${nixos.config.services.ollama.package}/bin/ollama" "serve" ];
+          Env = [
+            "OLLAMA_HOST=${nixos.config.services.ollama.listenAddress}"
+            
+          ];
+          ExposedPorts = { "11434/tcp" = {}; };
+          Volumes = { "/models" = {}; };
         };
       };
     };
