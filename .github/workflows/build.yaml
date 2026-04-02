@@ -28,22 +28,12 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Build image
-        run: |
-          nix run --accept-flake-config nixpkgs#nixos-generators -- \
-            --format docker \
-            --flake .#ollama \
-            -o result
-            
-      - name: Debug tarball contents
-        run: tar -tJf result/tarball/nixos-system-x86_64-linux.tar.xz | head -30
-
-      - name: Install skopeo
-        run: nix profile install nixpkgs#skopeo
+        run: nix build .#packages.x86_64-linux.default --accept-flake-config
 
       - name: Load image into Docker
         if: github.ref == 'refs/heads/main'
-        run: docker load < result/tarball/nixos-system-x86_64-linux.tar.xz
-
+        run: docker load < result
+        
       - name: Tag and push image
         if: github.ref == 'refs/heads/main'
         run: |
