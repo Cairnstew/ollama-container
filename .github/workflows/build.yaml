@@ -42,7 +42,7 @@ jobs:
 
       - name: Load image into Docker
         if: github.ref == 'refs/heads/main'
-        run: skopeo copy oci:result docker-daemon:ollama:latest
+        run: docker load < result/tarball/nixos-system-x86_64-linux.tar.xz
 
       - name: Tag and push image
         if: github.ref == 'refs/heads/main'
