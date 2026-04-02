@@ -29,10 +29,9 @@ jobs:
 
       - name: Build image
         run: |
-          nix run nixpkgs#nixos-generators -- \
+          nix run --accept-flake-config nixpkgs#nixos-generators -- \
             --format docker \
             --flake .#ollama \
-            --accept-flake-config \
             -o result
             
       - name: Debug result
